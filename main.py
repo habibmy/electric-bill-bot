@@ -47,6 +47,14 @@ def fetch_bill_pdf(ca_number):
     bill_pdf = response.content
     return bill_pdf
 
+def send_pdf_to_telegram_bot(pdf_file_path, bot_token, chat_id):
+    url = f"https://api.telegram.org/bot{bot_token}/sendDocument"
+    files = {'document': open(pdf_file_path, 'rb')}
+    data = {'chat_id': chat_id}
+    response = requests.post(url, files=files, data=data)
+    if response.status_code != 200:
+        raise Exception("Failed to send the PDF to Telegram.")
+
 def main():
     previous_bill_details = {}
 
@@ -64,9 +72,17 @@ def main():
         # Fetch the bill PDF.
         bill_pdf = fetch_bill_pdf(ca_number)
 
-        # Save the bill PDF to a file.
-        with open("bill.pdf", "wb") as f:
+        pdf_file_path = "bill.pdf"
+        with open(pdf_file_path, "wb") as f:
             f.write(bill_pdf)
+
+        bot_token = os.environ.get('TELEGRAM_BOT_TOKEN')
+        chat_id = os.environ.get('TELEGRAM_CHAT_ID')
+
+        if bot_token is None or chat_id is None:
+            raise Exception("Telegram bot token or chat ID is not set.")
+
+        send_pdf_to_telegram_bot(pdf_file_path, bot_token, chat_id)
 
         # Update the previous bill details.
         previous_bill_details = bill_details
