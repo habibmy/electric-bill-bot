@@ -3,6 +3,7 @@ import xml.etree.ElementTree as ET
 import json
 import os
 from dotenv import load_dotenv
+import sqlite3
 
 load_dotenv()
 
@@ -56,19 +57,33 @@ def send_pdf_to_telegram_bot(pdf_file_path, bot_token, chat_id):
         raise Exception("Failed to send the PDF to Telegram.")
 
 def main():
-    previous_bill_details = {}
-
     
     ca_number = os.environ.get('CA_NUMBER')
+
+    # Get the previous bill details from the database.
+    conn = sqlite3.connect('bill.db')
+    c = conn.cursor()
+
+    c.execute('''CREATE TABLE IF NOT EXISTS bills (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ca_number TEXT NOT NULL,
+    bill_details TEXT NOT NULL
+    )''')
+    c.execute("SELECT bill_details FROM bills ORDER BY id DESC LIMIT 1")
+    row = c.fetchone()
+    previous_bill_details = row[0] if row else None
+
+    conn.close()
 
     if ca_number is None:
         raise Exception("CA_NUMBER environment variable is not set.")
 
     # Fetch the bill details.
     bill_details = fetch_bill_details(ca_number)
+    bill_details_str = json.dumps(bill_details)
 
     # Check if the bill details are different.
-    if bill_details != previous_bill_details:
+    if bill_details_str != previous_bill_details:
         # Fetch the bill PDF.
         bill_pdf = fetch_bill_pdf(ca_number)
 
@@ -84,8 +99,18 @@ def main():
 
         send_pdf_to_telegram_bot(pdf_file_path, bot_token, chat_id)
 
+        # save bill details to sqlite
+        conn = sqlite3.connect('bill.db')
+        c = conn.cursor()
+        ca_number = str(ca_number)
+        c.execute("INSERT INTO bills (ca_number, bill_details) VALUES (?, ?)", (ca_number, bill_details_str))
+        conn.commit()
+        conn.close()
+
         # Update the previous bill details.
         previous_bill_details = bill_details
+    else:
+        print("No new bills")
 
 if __name__ == "__main__":
     main()
