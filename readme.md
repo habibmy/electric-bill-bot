@@ -1,6 +1,12 @@
 # Electric Bill Fetcher
 
 This script fetches Electric Bill for South Bihar and North Bihar Power Distrbution Company customers and send it to your telegram account.
+_Now it will also send bill details with pdf as caption._
+
+### To Do
+
+- [ ] Add More notification destination
+- [ ] Add option to fetch details for mutiple Consumers
 
 ### Getting Started
 
