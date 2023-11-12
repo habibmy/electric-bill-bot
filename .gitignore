@@ -2,3 +2,4 @@
 venv
 *.pdf
 *.db
+__pycache__/
