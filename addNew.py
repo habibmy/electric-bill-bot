@@ -3,7 +3,7 @@ import json
 import sqlite3
 
 def insert_notification_settings(ca_number, telegram_chat_ids, whatsapp_phone_numbers):
-    conn = sqlite3.connect("bill.db")
+    conn = sqlite3.connect("data/bill.db")
     c = conn.cursor()
 
     # Convert lists to JSON strings

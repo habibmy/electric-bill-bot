@@ -1,6 +1,6 @@
 import sqlite3
 
-conn = sqlite3.connect('bill.db')
+conn = sqlite3.connect('data/bill.db')
 
 try:
     c = conn.cursor()

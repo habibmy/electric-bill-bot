@@ -8,7 +8,7 @@ load_dotenv()
 
 def main():
     # Fetch all CA numbers and their associated messaging details from the database
-    conn = sqlite3.connect("bill.db")
+    conn = sqlite3.connect("data/bill.db")
     c = conn.cursor()
     c.execute("SELECT ca_number, telegram_chat_ids, whatsapp_phone_numbers FROM notification_settings")
     ca_numbers_and_details = c.fetchall()
@@ -25,7 +25,7 @@ def main():
         whatsapp_phone_numbers = json.loads(whatsapp_phone_numbers_str) if whatsapp_phone_numbers_str else []
 
         # Get the previous bill details from the database.
-        conn = sqlite3.connect("bill.db")
+        conn = sqlite3.connect("data/bill.db")
         c = conn.cursor()
 
         c.execute(
@@ -61,7 +61,7 @@ def main():
                     send_pdf_to_telegram_bot(bill_pdf, telegram_bot_token, chat_id, bill_details)
 
             # Save the bill details to the database.
-            conn = sqlite3.connect("bill.db")
+            conn = sqlite3.connect("data/bill.db")
             c = conn.cursor()
             c.execute(
                 "INSERT INTO bills (ca_number, bill_details) VALUES (?, ?)",
