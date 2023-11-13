@@ -5,5 +5,4 @@ RUN apk add --no-cache --virtual .build-deps build-base \
     && pip install --no-cache-dir -r requirements.txt \
     && apk del .build-deps build-base
 COPY addNew.py createDb.py functions.py main.py /app/
-RUN python createDb.py
 CMD ["python", "main.py"]
