@@ -9,6 +9,7 @@ _Now it will also send bill details with pdf as caption._
 
 - [ ] Add More notification destination
 - [ ] Add option to edit Telegram chat id and WhatsApp phone number
+- [x] ~~Create Dockerfile~~
 - [x] ~~Add option to fetch details for mutiple Consumers~~
 - [x] ~~Send with [Whatsapp API](https://github.com/aldinokemal/go-whatsapp-web-multidevice)~~
 
