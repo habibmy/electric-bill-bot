@@ -45,8 +45,10 @@ def main():
         bill_details = fetch_bill_details(ca_number)
         bill_details_str = json.dumps(bill_details)
 
+        previous_bill_details = json.loads(previous_bill_details) if previous_bill_details else {}
+
         # Check if the bill details have changed.
-        if bill_details_str != previous_bill_details:
+        if (bill_details.get("BillMonth") != previous_bill_details.get("BillMonth")):
             # Fetch the bill PDF.
             bill_pdf = fetch_bill_pdf(ca_number)
 
@@ -69,9 +71,6 @@ def main():
             )
             conn.commit()
             conn.close()
-
-            # Update the previous bill details.
-            previous_bill_details = bill_details
         else:
             print(f"No new bills for CA number: {ca_number}")
 
