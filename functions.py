@@ -41,7 +41,7 @@ def send_pdf_to_telegram_bot(pdf_file_data, bot_token, chat_id, bill_details):
 *Consumer:* {bill_details['ConsumerName']}
 *Month:* {bill_details['BillMonth']}
 *Due Date:* {bill_details['DueDate']}
-*Amount Due:* ₹{bill_details['PreviousAmount']}
+*Amount Due:* ₹{bill_details['AmountBeforeDueDate']}
 
 *Previous Amount:* ₹{bill_details['PreviousAmount']}
 *Previous Date:* {bill_details['PreviousDate']}
@@ -67,7 +67,7 @@ def send_bill_to_whatsapp(whatsapp_api_url, phone_number, bill_details, bill_pdf
 *Consumer:* {ConsumerName}
 *Month:* {BillMonth}
 *Due Date:* {DueDate}
-*Amount Due:* ₹{PreviousAmount}
+*Amount Due:* ₹{AmountBeforeDueDate}
 
 *Previous Amount:* ₹{PreviousAmount}
 *Previous Date:* {PreviousDate}
