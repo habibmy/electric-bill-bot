@@ -50,9 +50,9 @@ def send_pdf_to_telegram_bot(pdf_file_data, bot_token, chat_id, bill_details):
 
 *Please settle your bill by the due date to avoid late payment fees.*
 """
-
+    file_name = bill_details['ConsumerName'] + "-" + bill_details['BillMonth'] + "-bill.pdf"
     url = f"https://api.telegram.org/bot{bot_token}/sendDocument"
-    files = {"document": ("bill.pdf", pdf_file_data)}
+    files = {"document": (file_name, pdf_file_data)}
     data = {"chat_id": chat_id, "caption": caption, "parse_mode": "Markdown"}
     response = requests.post(url, files=files, data=data)
     if response.status_code != 200:
