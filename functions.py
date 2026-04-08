@@ -1,6 +1,7 @@
 import requests
 import xml.etree.ElementTree as ET
 import json
+from playwright.sync_api import sync_playwright
 
 def fetch_bill_details(ca_number):
 
@@ -18,21 +19,35 @@ def fetch_bill_details(ca_number):
     return bill_details
 
 
+# def fetch_bill_pdf(ca_number):
+
+#     # Returns:
+#     #   The bill PDF in binary format.
+
+#     response = requests.get(
+#         "http://hargharbijli.bsphcl.co.in/WebService/WebServiceGIS.asmx/GetConsumerBillingPdf",
+#         params={"CA_Number": ca_number},
+#     )
+#     if response.status_code != 200:
+#         raise Exception("Failed to fetch bill PDF.")
+
+#     bill_pdf = response.content
+#     return bill_pdf
+
 def fetch_bill_pdf(ca_number):
 
     # Returns:
     #   The bill PDF in binary format.
 
     response = requests.get(
-        "http://hargharbijli.bsphcl.co.in/WebService/WebServiceGIS.asmx/GetConsumerBillingPdf",
-        params={"CA_Number": ca_number},
+        "https://api.bsphcl.co.in/sbWSMobileApp/ViewBill.asmx/GetViewBill",
+        params={"strCANumber": ca_number},headers = {"User-Agent": "Mozilla/5.0"}
     )
     if response.status_code != 200:
         raise Exception("Failed to fetch bill PDF.")
 
     bill_pdf = response.content
     return bill_pdf
-
 
 def send_pdf_to_telegram_bot(pdf_file_data, bot_token, chat_id, bill_details):
     caption = f"""
@@ -90,3 +105,49 @@ Please settle your bill by the due date to avoid late payment fees.
 
     if response.status_code != 200:
         raise Exception("Failed to send bill PDF to WhatsApp.")
+    
+def fetch_bill_details_with_playwright(page, ca_number):
+
+    responses = []
+
+    def handle_response(response):
+        if "SpmIntegrationsData" in response.url:
+            try:
+                data = response.json()
+                responses.append(data)
+            except:
+                pass
+
+    page.on("response", handle_response)
+
+    # input
+    page.fill('input[formcontrolname="accno"]', "")
+    page.fill('input[formcontrolname="accno"]', ca_number)
+    page.click('button:has-text("Search")')
+
+    page.wait_for_selector('a:has-text("View Bill")')
+    page.remove_listener("response", handle_response)
+
+    bill = None
+    history = None
+
+    # 🔍 classify responses
+    for r in responses:
+        try:
+            d = r[0]["data"]
+
+            # bill data
+            if "billMonth" in d:
+                bill = d
+
+            # history data
+            elif "data" in d:
+                history = r
+
+        except:
+            pass
+
+    return {
+        "bill": bill,
+        "history": history
+    }
